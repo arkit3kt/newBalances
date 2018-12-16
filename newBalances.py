@@ -1,11 +1,13 @@
 import csv
 OldCoin = .00000001
-NewCoin = .000000001
+NewCoin = .0000000001
+
 accounts = []
 count = 1
 newbalance = 0
 # open csv and add addresses + balances to accounts list
-with open('C:\posqdbSnapshot1\Addresses.csv') as f:
+#with open('C:\posqdbSnapshot1\Addresses.csv') as f:
+with open('C:/users/bunchies/Downloads/balances.csv') as f:
     reader = csv.reader(f)
     for row in reader:
         accounts.append([{'address':row[1], 'balance':row[2]}])
@@ -28,6 +30,7 @@ for i in range(len(accounts) - 1):
 print("\nTotal Addresses", count-1)
 print("Total addresses with balance > 0 :", balancecount)
 print('Total POSQ in circulation', newbalance * OldCoin)
+print("Current ratio = {}:1".format(int(NewCoin * 1000000000000)))
 print('NEW Total circulation : ', newbalance * NewCoin)
 
 
