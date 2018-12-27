@@ -62,14 +62,14 @@ for i in distribution:
     amount = i[0]
     address = i[1]
     try:
-        #hash = RPC.sendtoaddress(address, amount)
-        success.append([address, amount])#, hash])
-        print("Distribution # {0} | {1} sent | {2} | {3}".format(count, address, amount, "hash"))
-
-        # time.sleep(5)
-    except:
+        hash = RPC.sendtoaddress(address, float(amount))
+        success.append([address, amount, hash])
+        print("Distribution # {0} | {1} sent | {2} | {3}".format(count, address, amount, hash))
+        time.sleep(3)
+    except Exception as e:
+        print(e)
         failures.append([address, amount])
-        print("Failed to send {0} to {1}".format(amount, address) )
+        print("Failed to send {0} to {1}".format(amount, address))
     count+=1
 
 
