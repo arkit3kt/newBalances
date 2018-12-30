@@ -1,22 +1,18 @@
 import csv
+from collections import OrderedDict
 import time
 import logging
 logging.basicConfig()
 from bitcoinrpc.authproxy import AuthServiceProxy, JSONRPCException
 logging.getLogger("POSQ-RPC").setLevel(logging.DEBUG)
-
 rpc_user = "posqrpc"
 rpc_password = "password"
-
 RPC = AuthServiceProxy("http://%s:%s@127.0.0.1:16978"%(rpc_user, rpc_password))
-
 OldCoin = .00000001
 NewCoin = .0000000001
 accounts = []
-distribution = []
-
+distribution = {}
 circulation = 0
-
 
 # open csv and add addresses + balances to accounts list
 with open('balances.csv') as f:
@@ -34,10 +30,12 @@ for i in range(len(accounts) - 1):
     balance = float(balance)
     if balance > 0:
         newbalance = balance * NewCoin
+        if newbalance < 1:
+            newbalance = 1
         #print("\n#", count, " Address = ", address)
         #print('Old Balance = ', balance * OldCoin)
         #print('New Balance = ', newbalance)
-        distribution.append(["{0:.8f}".format(newbalance), address])
+        distribution.update({address:'{0:.8f}'.format(float(newbalance))})
         circulation += balance
         balancecount += 1
     count += 1
@@ -49,29 +47,56 @@ print("Current ratio = {}:1".format(int(NewCoin * 1000000000000)))
 print('NEW Total circulation : ', circulation * NewCoin)
 
 
-## LEAVE HASH, TIMER AND RPC TEST COMMENTED OUT TILL PREP
-#print("*** TESTING RPC ***")
-#print(RPC.getinfo())
-
 print("\nBegin Distribution!\n")
 count = 0
-distribution.sort(reverse=True)
-failures = []
+tot_distr = 0
+total = 0
+sendmany = {}
 success = []
-for i in distribution:
-    amount = i[0]
-    address = i[1]
-    try:
-        hash = RPC.sendtoaddress(address, float(amount))
-        success.append([address, amount, hash])
-        print("Distribution # {0} | {1} sent | {2} | {3}".format(count, address, amount, hash))
-        time.sleep(3)
-    except Exception as e:
-        print(e)
-        failures.append([address, amount])
-        print("Failed to send {0} to {1}".format(amount, address))
-    count+=1
+failures = []
+length = len(distribution)
+Ordered = OrderedDict(sorted(distribution.items(), key=lambda x: x[1],reverse=True))
+for j, k in Ordered.items():
 
+    if count >=100:
+        try:
+
+            hash = RPC.sendmany("MARKETING", sendmany)
+            print("Distriubtion # : ", tot_distr, " | hash ", hash, " | sent : ", sendmany)
+            count = 0
+            success.append([hash, str(sendmany)])
+            sendmany.clear()
+            time.sleep(2)
+            tot_distr = tot_distr + 1
+        except Exception as e:
+            print("Failure : ", e)
+            failures.append(sendmany)
+            print("Failed to send : ", sendmany)
+            count = 0
+            time.sleep(30)
+            sendmany.clear()
+    elif total == length - 1:
+        try:
+
+            hash = RPC.sendmany("MARKETING", sendmany)
+            print("Distriubtion # : ", tot_distr, " | hash : ", hash, " | sent : ", sendmany)
+            count = 0
+            success.append([hash, sendmany])
+            sendmany.clear()
+            time.sleep(5)
+            tot_distr = tot_distr + 1
+        except Exception as e:
+            print("Failure : ", e)
+            failures.append(sendmany)
+            print("Failed to send : ", sendmany)
+            count = 0
+            time.sleep(30)
+            sendmany.clear()
+    else:
+        sendmany.update({j:float(k)})
+
+    count = count + 1
+    total +=1
 
 print("\nWriting results to file ...")
 file = open("FinishedDistribution", "w+")
