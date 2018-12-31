@@ -13,6 +13,7 @@ NewCoin = .0000000001
 accounts = []
 distribution = {}
 circulation = 0
+newCirculation = 0
 
 # open csv and add addresses + balances to accounts list
 with open('balances.csv') as f:
@@ -37,14 +38,15 @@ for i in range(len(accounts) - 1):
         #print('New Balance = ', newbalance)
         distribution.update({address:'{0:.8f}'.format(float(newbalance))})
         circulation += balance
+        newCirculation += newbalance
         balancecount += 1
     count += 1
 
 print("\nTotal Addresses", count-1)
 print("Total addresses with balance > 0 :", balancecount)
 print('Total POSQ in circulation', circulation * OldCoin)
-print("Current ratio = {}:1".format(int(NewCoin * 1000000000000)))
-print('NEW Total circulation : ', circulation * NewCoin)
+
+print('NEW Total circulation : ', newCirculation)
 
 
 print("\nBegin Distribution!\n")
@@ -54,15 +56,17 @@ total = 0
 sendmany = {}
 success = []
 failures = []
+totalDistributed = 0
 length = len(distribution)
 Ordered = OrderedDict(sorted(distribution.items(), key=lambda x: x[1],reverse=True))
 for j, k in Ordered.items():
 
+    totalDistributed += float(k)
     if count >=100:
         try:
 
-            hash = RPC.sendmany("MARKETING", sendmany)
-            print("Distriubtion # : ", tot_distr, " | hash ", hash, " | sent : ", sendmany)
+            hash = RPC.sendmany("", sendmany)
+            print("Distribution # : ", tot_distr, " | hash ", hash, " | sent : ", sendmany)
             count = 0
             success.append([hash, str(sendmany)])
             sendmany.clear()
@@ -77,13 +81,13 @@ for j, k in Ordered.items():
             sendmany.clear()
     elif total == length - 1:
         try:
-
-            hash = RPC.sendmany("MARKETING", sendmany)
-            print("Distriubtion # : ", tot_distr, " | hash : ", hash, " | sent : ", sendmany)
+            print("Final Distribution")
+            hash = RPC.sendmany("", sendmany)
+            print("Distribution # : ", tot_distr, " | hash : ", hash, " | sent : ", sendmany)
             count = 0
             success.append([hash, sendmany])
             sendmany.clear()
-            time.sleep(5)
+            time.sleep(2)
             tot_distr = tot_distr + 1
         except Exception as e:
             print("Failure : ", e)
@@ -98,10 +102,10 @@ for j, k in Ordered.items():
     count = count + 1
     total +=1
 
+
 print("\nWriting results to file ...")
 file = open("FinishedDistribution", "w+")
 file.write("Successful Distributions : \n" + str(success))
 file.write("\n\n\nFailed Distributions : \n " + str(failures))
 file.close()
-print("Distribution Complete!")
-
+print("Total POSQ Distributed = ", totalDistributed)
