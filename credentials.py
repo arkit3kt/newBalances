@@ -1,0 +1,9 @@
+
+RPCUSER = ""
+RPCPASSWORD = ""
+RPCPORT = ""
+
+DB = ""
+DBUNAME = ""
+DBPASS = ""
+DBPORT = 3306
