@@ -29,8 +29,8 @@ for i in range(len(accounts) - 1):
     address = accounts[count][0]['address']
     address = str(address)
     balance = float(balance)
+    newbalance = balance * NewCoin
     if balance > 0:
-        newbalance = balance * NewCoin
         if newbalance < 1:
             newbalance = 1
         #print("\n#", count, " Address = ", address)
@@ -109,3 +109,4 @@ file.write("Successful Distributions : \n" + str(success))
 file.write("\n\n\nFailed Distributions : \n " + str(failures))
 file.close()
 print("Total POSQ Distributed = ", totalDistributed)
+

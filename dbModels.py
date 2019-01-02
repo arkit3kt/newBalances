@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, MetaData, Column, VARCHAR, INT, BIGINT, FLOAT, ForeignKey, Table, collate
+from sqlalchemy import create_engine, MetaData, Column, VARCHAR, INT, BIGINT, FLOAT, REAL, ForeignKey, Table, collate
 from sqlalchemy import MetaData
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy import Column
@@ -74,7 +74,7 @@ class pUsers(base):
     bid = Column(INT, default=None)
     uname = Column(VARCHAR)
     addr = Column(VARCHAR)
-    bal = Column(FLOAT)
+    bal = Column(REAL)
     LFlip = Column(BIGINT, default=None)
     LRoll = Column(BIGINT, default=None)
     txs = relationship('pTxs', backref='owner')
@@ -89,7 +89,7 @@ class pTxs(base):
     tid = Column(BIGINT, primary_key=True)
     uid = Column(BIGINT, ForeignKey('users.uid'))
     type = Column(VARCHAR)
-    amount = Column(FLOAT)
+    amount = Column(REAL)
     hash = Column(VARCHAR, default=None)
 
 
@@ -102,8 +102,8 @@ class pGambles(base):
     uid = Column(BIGINT, ForeignKey('users.uid'))
     game = Column(VARCHAR)
     outcome = Column(VARCHAR)
-    bet = Column(FLOAT)
-    paid = Column(FLOAT, default=None)
+    bet = Column(REAL)
+    paid = Column(REAL, default=None)
 
 
     def __repr__(self):
@@ -128,11 +128,11 @@ def metaModels(engine):
                Column('uid', INT, primary_key=True),
                Column('did', VARCHAR(50)),
                Column('bid', BIGINT),
-               Column('bal', FLOAT, default=None),
+               Column('bal', REAL, default=0),
                Column('uname', VARCHAR(100), default=None),
                Column('addr', VARCHAR(34)),
-               Column('Lflip', BIGINT, default=None),
-               Column('Lroll', BIGINT, default=None),
+               Column('Lflip', BIGINT, default=0),
+               Column('Lroll', BIGINT, default=0),
                mysql_engine='InnoDB',
                mysql_charset='utf8mb4'
                )
@@ -141,7 +141,7 @@ def metaModels(engine):
                Column('tid', BIGINT, primary_key=True),
                Column('uid', BIGINT),
                Column('type', VARCHAR(3)),
-               Column('amount', FLOAT),
+               Column('amount', REAL),
                Column('hash', VARCHAR(100), default=None),
                mysql_engine='InnoDB',
                mysql_charset='utf8mb4'
@@ -152,13 +152,13 @@ def metaModels(engine):
                Column('uid', BIGINT),
                Column('game', VARCHAR(4)),
                Column('outcome', VARCHAR(1)),
-               Column('bet', FLOAT),
-               Column('paid', FLOAT, default=None),
+               Column('bet', REAL),
+               Column('paid', REAL, default=0),
                mysql_engine='InnoDB',
                mysql_charset='utf8mb4'
                )
     t4 = Table('counter', meta,
-               Column('count', BIGINT, default=None, primary_key=True),
+               Column('count', BIGINT, default=0, primary_key=True),
                mysql_engine='InnoDB',
                mysql_charset='utf8mb4'
                )
