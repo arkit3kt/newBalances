@@ -62,6 +62,15 @@ class Gambles(base):
     def __repr__(self):
         return "<Gambles(uid=%s, wid=%s, amount=%s, game=%s)>" % (self.uid, self.win_id,self.amount, self.game)
 
+class Count(base):
+
+    __tablename__ = "count"
+    count = Column(BIGINT, default=0, primary_key=True)
+
+    def __repr__(self):
+        return "<counter(count=%s)>" % (self.count)
+
+
 """
 **POSQDB MODELS**
 """
@@ -71,12 +80,12 @@ class pUsers(base):
     __tablename__ = "users"
     uid = Column(BIGINT, primary_key=True)
     did = Column(VARCHAR)
-    bid = Column(INT, default=None)
+    bid = Column(INT, default=0)
     uname = Column(VARCHAR)
     addr = Column(VARCHAR)
     bal = Column(REAL)
-    LFlip = Column(BIGINT, default=None)
-    LRoll = Column(BIGINT, default=None)
+    LFlip = Column(BIGINT, default=0)
+    LRoll = Column(BIGINT, default=0)
     txs = relationship('pTxs', backref='owner')
     gambles = relationship('pGambles', backref='owner')
 
@@ -89,7 +98,7 @@ class pTxs(base):
     tid = Column(BIGINT, primary_key=True)
     uid = Column(BIGINT, ForeignKey('users.uid'))
     type = Column(VARCHAR)
-    amount = Column(REAL)
+    amount = Column(REAL, default=0)
     hash = Column(VARCHAR, default=None)
 
 
@@ -102,8 +111,8 @@ class pGambles(base):
     uid = Column(BIGINT, ForeignKey('users.uid'))
     game = Column(VARCHAR)
     outcome = Column(VARCHAR)
-    bet = Column(REAL)
-    paid = Column(REAL, default=None)
+    bet = Column(REAL, default=0)
+    paid = Column(REAL, default=0)
 
 
     def __repr__(self):
@@ -112,7 +121,7 @@ class pGambles(base):
 class Counter(base):
 
     __tablename__ = "counter"
-    count = Column(BIGINT, default=None, primary_key=True)
+    count = Column(BIGINT, default=0, primary_key=True)
 
     def __repr__(self):
         return "<counter(count=%s)>" % (self.count)

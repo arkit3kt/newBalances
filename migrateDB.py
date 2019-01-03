@@ -5,11 +5,13 @@ class processData:
     """
     class takes 1 param :users [all users in DB]
     """
-    def __init__(self, users):
+    def __init__(self, users, counter):
         self.users = users
-        self.convertData(users)
+        self.counter = counter
+        self.convertData(users, counter)
 
-    def convertData(self, users):
+
+    def convertData(self, users, counter):
         """
         convert users balances 100:1
         and clean up discord IDs
@@ -25,7 +27,8 @@ class processData:
             print("UID :", u.uid, " dID :", u.id_number,
                   "Old Balance : {0:0.8f}".format(balance), "\t New Bal :", newbalance)
         print("New Balances assigned and dIDs cleaned successfully!")
-        self.addData(users)
+
+        self.addData(users, counter)
 
 
     def cleanDiscordID(self, dID):
@@ -63,7 +66,7 @@ class processData:
         metaModels(engine2)
         return posqDB
 
-    def addData(self, users):
+    def addData(self, users, counter):
         posqDB = self.prepNewDatabase()
         print("Adding data to posqDB...")
 
@@ -104,15 +107,19 @@ class processData:
                 gambles.outcome = None
                 gambles.paid = w.amount
                 posqDB.add(gambles)
-
+            countr = Counter(count=counter)
+            posqDB.add(countr)
             posqDB.commit()
             print("Data added successfully!!!")
         except Exception as e:
             print("FAILED : ", e)
 
+counter = session.query(Count).first()
+
 
 users = session.query(User).all()
-processData(users)
+
+processData(users, counter.count)
 
 
 """
