@@ -1,9 +1,9 @@
 
-RPCUSER = ""
+RPCUSER = "posqrpc"
 RPCPASSWORD = ""
-RPCPORT = ""
+RPCPORT = 5511
 
-DB = ""
-DBUNAME = ""
+DB = "poseidon"
+DBUNAME = "root"
 DBPASS = ""
 DBPORT = 3306

@@ -2,12 +2,14 @@ import csv
 from collections import OrderedDict
 import time
 import logging
+from credentials import *
 logging.basicConfig()
 from bitcoinrpc.authproxy import AuthServiceProxy, JSONRPCException
 logging.getLogger("POSQ-RPC").setLevel(logging.DEBUG)
-rpc_user = "posqrpc"
-rpc_password = "password"
-RPC = AuthServiceProxy("http://%s:%s@127.0.0.1:16978"%(rpc_user, rpc_password))
+
+
+
+RPC = AuthServiceProxy("http://%s:%s@127.0.0.1:%s"%(RPCUSER, RPCPASSWORD, RPCPORT))
 OldCoin = .00000001
 NewCoin = .0000000001
 accounts = []
@@ -33,9 +35,9 @@ for i in range(len(accounts) - 1):
     if balance > 0:
         if newbalance < 1:
             newbalance = 1
-        #print("\n#", count, " Address = ", address)
-        #print('Old Balance = ', balance * OldCoin)
-        #print('New Balance = ', newbalance)
+        print("\n#", count, " Address = ", address)
+        print('Old Balance = ', balance * OldCoin)
+        print('New Balance = ', newbalance)
         distribution.update({address:'{0:.8f}'.format(float(newbalance))})
         circulation += balance
         newCirculation += newbalance
@@ -47,6 +49,18 @@ print("Total addresses with balance > 0 :", balancecount)
 print('Total POSQ in circulation', circulation * OldCoin)
 
 print('NEW Total circulation : ', newCirculation)
+
+print("\nChecking RPC connection...")
+time.sleep(3)
+
+try :
+    RPC.getinfo()
+    print("RPC connection established")
+
+except Exception as e:
+    print("YOU FUCKED UP : ", e)
+    print("sleeping 30 seconds")
+    time.sleep(30)
 
 
 print("\nBegin Distribution!\n")
